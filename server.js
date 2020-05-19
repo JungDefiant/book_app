@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const superagent = require('superagent');
+// const superagent = require('superagent');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -14,6 +14,10 @@ app.set('view engine', 'ejs');
 
 app.get('/hello', (req, res) => {
   res.render('pages/index');
+});
+
+app.get('/searches/new', (req, res) => {
+  res.render('pages/searches/new');
 });
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
