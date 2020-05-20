@@ -1,0 +1,1 @@
+INSERT INTO books (title, authors, description, img_url) VALUES ('', '', '', '');

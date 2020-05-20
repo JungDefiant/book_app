@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book List</title>
+</head>
+<body>
+  <ul>
+    <% arrayBookItems.forEach(bookItem => { %>
+      <% if(bookItem !== null) { %>
+      <li>
+        <img src=<%= bookItem.img_url %>>
+        <h1><%= bookItem.title %></h1>
+        <h2><%= bookItem.authors %></h2>
+        <p><%= bookItem.description %></p>
+      </li>
+      <% } %>
+    <% }) %>
+  </ul>
+</body>
+</html>
