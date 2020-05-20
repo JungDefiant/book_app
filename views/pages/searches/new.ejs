@@ -6,15 +6,21 @@
   <title>Search Bar</title>
 </head>
 <body>
-  <form action="/new">
+  <form action="/searches/new" method="POST">
     <fieldset>
       <legend>Find a Book!</legend>
-      <label for="title">Title</label>
-      <input type="text" name="title">
+      <label for="searchQuery">Query</label>
+      <input type="text" name="search[query]" value = ''>
 
-      <label for="author">Author</label>
-      <input type="text" name="author">
+      <label for="searchByTitle">Title</label>
+      <input type="radio" name="search[type]" value="title">
+
+      <label for="searchByAuthor">Author</label>
+      <input type="radio" name="search[type]" value="author">
+
+      <input type="submit">
     </fieldset>
   </form>
+  <%- include('show', { bookItems : arrayBookItems }); %>
 </body>
 </html>
