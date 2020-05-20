@@ -1,8 +1,15 @@
 'use strict';
 
+// Catching up with group
+
 const express = require('express');
 const dotenv = require('dotenv');
 const superagent = require('superagent');
+const pg = require('pg');
+
+const client = new pg.Client(process.env.DATABASE_URL);
+client.on('error', console.error);
+client.connect();
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -17,10 +24,16 @@ app.get('/hello', (req, res) => {
 });
 
 app.get('/', (req, res) => {
+  client.query('SELECT * FROM tasks')
+    .then(result => {
+      res.render('pages/index.ejs', { tasksArr : result.rows});
+    })
+    .catch(console.log);
   res.render('pages/index');
 });
 
 app.get('/searches/new', (req, res) => {
+
   res.render('pages/searches/new');
 });
 
