@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Book Details</title>
+</head>
+<body>
+  <%- include('detail', { bookItem : bookToDisplay }); %>
+  <button id="update">Update Book</button>
+  <form action="/books/<%= id>/update?_override=PUT" method="POST">
+    <fieldset>
+      <legend>Edit Book Details!</legend>
+      <label for="searchQuery">Query</label>
+      <input type="text" name="search[query]" value = ''>
+
+      <label for="description">Title</label>
+      <input type="radio" name="description" value="<%= title &>">
+
+      <label for="searchByAuthor">Author</label>
+      <input type="radio" name="description" value="<%= description &>">
+
+      <input type="submit">
+    </fieldset>
+  </form>
+</body>
+</html>

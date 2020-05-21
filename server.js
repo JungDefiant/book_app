@@ -1,17 +1,15 @@
 'use strict';
 
-// Catching up with group
-
 const express = require('express');
 const dotenv = require('dotenv');
 const superagent = require('superagent');
 const pg = require('pg');
+dotenv.config();
 
 const client = new pg.Client(process.env.DATABASE_URL);
 client.on('error', console.error);
 client.connect();
 
-dotenv.config();
 const PORT = process.env.PORT || 3000;
 const app = express();
 
@@ -19,31 +17,63 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('./public'));
 app.set('view engine', 'ejs');
 
-app.get('/hello', (req, res) => {
-  res.render('pages/index');
-});
+app.get('/', displaySavedBooks);
 
-app.get('/', (req, res) => {
-  client.query('SELECT * FROM tasks')
+app.get('/books/:id', displaySingleBook);
+
+app.get('/searches/new', displaySearchPage);
+
+app.post('/searches/new', makeAndDisplaySearch);
+
+function Book(bookInfo) {
+  this.title = bookInfo.title ? bookInfo.title : 'Book Title';
+  this.authors = bookInfo.authors ? bookInfo.authors : 'No author';
+  this.description = bookInfo.description ? bookInfo.description : 'No description';
+
+  if (bookInfo.imageLinks.smallThumbnail) {
+    if (bookInfo.imageLinks.smallThumbnail[4] === ':') {
+      bookInfo.imageLinks.smallThumbnail = bookInfo.imageLinks.smallThumbnail.split(':').join('s:');
+    }
+  }
+
+  this.img_url = bookInfo.imageLinks.smallThumbnail ? bookInfo.imageLinks.smallThumbnail : 'https://i.imgur.com/J5LVHEL.jpg';
+}
+
+function displaySavedBooks(req, res) {
+  client.query('SELECT * FROM books')
     .then(result => {
-      res.render('pages/index.ejs', { tasksArr : result.rows});
+      if(result.rows.length > 0) res.render('pages/index', { numBooks: result.rows.length, savedBooks: result.rows });
+      else res.redirect('/searches/new');
     })
     .catch(console.log);
-  res.render('pages/index');
-});
+}
 
-app.get('/searches/new', (req, res) => {
+function displaySingleBook(req, res) {
+  console.log(req.params.id);
+  client.query(`SELECT * FROM books WHERE id = ${req.params.id}`)
+    .then(result => {
+      console.log(result.rows[0]);
+      res.render('pages/books/show', { bookToDisplay: result.rows[0] });
+    })
+    .catch(console.log);
+}
 
-  res.render('pages/searches/new');
-});
+function saveBook(bookInfo) {
+  // const sqlQuery = `INSERT INTO books (title, authors, description, img_url, isbn, bookshelf) VALUES ($1, $2, $3, $4, $5, $6)`;
+  // client.query(sqlQuery, bookInfo)
+  //   .then(result => {
 
-app.post('/searches/new', (req, res) => {
+  //   })
+}
+
+function displaySearchPage(req, res) {
+  res.render('pages/searches/new', { 'arrayBookItems': [] });
+}
+
+function makeAndDisplaySearch(req, res) {
   const url = 'https://www.googleapis.com/books/v1/volumes';
   const { query, type } = req.body.search;
-  let queryParam = '';
-
-  if (type === 'author') queryParam += 'inauthor';
-  else if (type === 'title') queryParam += 'intitle';
+  let queryParam = 'in' + type;
 
   superagent.get(url)
     .query({
@@ -56,32 +86,12 @@ app.post('/searches/new', (req, res) => {
       res.render('pages/searches/new', { 'arrayBookItems': bookList });
     })
     .catch(error => {
-      res.render('pages/error', { 'error': error });
+      displayErrorPage(res, error);
     });
-});
+}
 
-function Book(bookInfo) {
-  this.title = bookInfo.title ? bookInfo.title : 'Book Title';
-  this.authors = bookInfo.authors ? bookInfo.authors : 'No author';
-  this.description = bookInfo.description ? bookInfo.description : 'No description';
-
-  // if (bookInfo.imageLinks) {
-  //   console.log(bookInfo.imageLinks);
-  //   if (bookInfo.imageLinks.smallThumbnail) {
-  //     if (bookInfo.imageLinks.smallThumbnail[4] === ':') {
-  //       bookInfo.imageLinks.smallThumbnail = bookInfo.imageLinks.smallThumbnail.split(':').join('s:');
-  //     }
-  //   }
-  //   this.img_url = bookInfo.imageLinks.smallThumbnail ? bookInfo.imageLinks.smallThumbnail : 'https://i.imgur.com/J5LVHEL.jpg';
-  // }
-
-  if (bookInfo.imageLinks.smallThumbnail) {
-    if (bookInfo.imageLinks.smallThumbnail[4] === ':') {
-      bookInfo.imageLinks.smallThumbnail = bookInfo.imageLinks.smallThumbnail.split(':').join('s:');
-    }
-  }
-
-  this.img_url = bookInfo.imageLinks.smallThumbnail ? bookInfo.imageLinks.smallThumbnail : 'https://i.imgur.com/J5LVHEL.jpg';
+function displayErrorPage(res, error) {
+  res.render('pages/error', { 'error': error });
 }
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));

@@ -1,1 +1,1 @@
-INSERT INTO books (title, authors, description, img_url) VALUES ('', '', '', '');
+INSERT INTO books (title, authors, description, img_url, isbn, bookshelf) VALUES ('TEST', '[TEST]', 'TEST', 'TEST', 'TEST', 'TEST')
