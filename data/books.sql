@@ -6,4 +6,6 @@ CREATE TABLE books (
   authors TEXT,
   description TEXT,
   img_url TEXT,
+  isbn TEXT,
+  bookshelf TEXT
 )

@@ -6,17 +6,16 @@
   <title>Book List</title>
 </head>
 <body>
-  <ul>
-    <% arrayBookItems.forEach(bookItem => { %>
-      <% if(bookItem !== null) { %>
-      <li>
+  <% arrayBookItems.forEach(bookItem => { %>
+    <% if(bookItem !== null) { %>
+      <section>
         <img src=<%= bookItem.img_url %>>
         <h1><%= bookItem.title %></h1>
         <h2><%= bookItem.authors %></h2>
         <p><%= bookItem.description %></p>
-      </li>
-      <% } %>
-    <% }) %>
-  </ul>
+      </section>
+      <!--  include('/books/detail', { bookItem : bookItem }); -->
+    <% } %>
+  <% }) %>
 </body>
 </html>
